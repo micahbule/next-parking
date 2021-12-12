@@ -27,10 +27,7 @@ export default function Home() {
         py={[0, 10, 20]}
         direction={{ base: "column", md: "row" }}
       >
-        <Text>
-          {" "}
-          <Link href="/parking-spaces">Click here to see parking spaces.</Link>
-        </Text>
+        <Link href="/parking-spaces">Click here to see parking spaces.</Link>
         <Registration
           bgColor={bgColor}
           secondaryTextColor={secondaryTextColor}
