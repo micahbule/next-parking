@@ -19,7 +19,7 @@ import {
   useBreakpointValue,
 } from "@chakra-ui/react";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 
 const CreateParkingSpace = ({ bgColor, secondaryTextColor }) => {
@@ -33,10 +33,8 @@ const CreateParkingSpace = ({ bgColor, secondaryTextColor }) => {
   const [updatedBy, setUpdatedBy] = useState("admin for now - edit");
 
   const submitHandler = () => {
-    if (
-      spaceName !== ""
-      //  && if name exists// add if duplicate name
-    ) {
+    if (spaceName !== "") {
+      //  TODO: error handling, if name exists// add if duplicate name
       let data = {
         name: spaceName,
         slots: slots,
@@ -80,10 +78,6 @@ const CreateParkingSpace = ({ bgColor, secondaryTextColor }) => {
       >
         <VStack spacing={3} alignItems="flex-start">
           <Heading size="2xl">Create New Parking Space</Heading>
-          {/* <Text>
-            Or view/edit parking spaces{" "}
-            <Link href="/create-parking-space">here</Link>.
-          </Text> */}
         </VStack>
         <SimpleGrid columns={2} columnGap={3} rowGap={6} w="full">
           <GridItem colSpan={colSpan}>
@@ -91,7 +85,7 @@ const CreateParkingSpace = ({ bgColor, secondaryTextColor }) => {
               <FormLabel>Parking Space Name</FormLabel>
               <Input
                 placeholder="Name of Space"
-                value={spaceName}
+                // value={spaceName}
                 bg="white.100"
                 onChange={(e) => setSpaceName(e.target.value)}
               ></Input>
@@ -138,22 +132,3 @@ const CreateParkingSpace = ({ bgColor, secondaryTextColor }) => {
 };
 
 export default CreateParkingSpace;
-
-// <GridItem colSpan={2}>
-//   <FormControl>
-//     <FormLabel>Address</FormLabel>
-//     <Input placeholder="5th Ave." bg="white.100"></Input>
-//   </FormControl>
-// </GridItem>
-// <GridItem colSpan={colSpan}>
-//   <FormControl>
-//     <FormLabel>City</FormLabel>
-//     <Input placeholder="Taguig" bg="white.100"></Input>
-//   </FormControl>
-// </GridItem>
-// <GridItem colSpan={2}>
-//   <FormControl>
-//     <FormLabel>Email</FormLabel>
-//     <Input placeholder="juana.dc@email.com" bg="white.100"></Input>
-//   </FormControl>
-// </GridItem>

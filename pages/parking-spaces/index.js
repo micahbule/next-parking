@@ -5,17 +5,16 @@ import {
   useColorMode,
   useColorModeValue,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 
 import CreateParkingSpace from "./create-parking-space";
 import ParkingSpacesList from "./parking-spaces-list";
 
 import { getParkingSpaces } from "../../lib/api";
-import { getParkingSpacesId } from "../../lib/api";
 
-export default function ({ data, parkingSpaceId }) {
-  console.log(data, parkingSpaceId);
+export default function ({ data }) {
+  console.log(data);
 
   const [parkingList, setParkingList] = useState(data);
 
@@ -23,9 +22,20 @@ export default function ({ data, parkingSpaceId }) {
   const bgColor = useColorModeValue("gray.50", "whiteAlpha.50");
   const secondaryTextColor = useColorModeValue("gray.600", "gray.400");
 
+  // TODO: doesn't update automatically when a new parking space is addded welp
+  useEffect(() => {
+    axios
+      .get(`https://entity-sandbox.meeco.dev/api/parking-spaces`)
+      .then((res) => {
+        console.log("spaces updated", res.data.data);
+        let updatedList = res.data.data;
+        setParkingList(updatedList);
+      });
+  }, []);
+
   // edit details in list
   const editItem = (id) => {
-    console.log(id, "deleted");
+    console.log(id, "edited");
     // axios
     //   .put(`https://entity-sandbox.meeco.dev/api/parking-spaces/${id}`, {
     //     data,
@@ -71,11 +81,9 @@ export default function ({ data, parkingSpaceId }) {
 
 export async function getServerSideProps() {
   const data = await getParkingSpaces();
-  const parkingSpaceId = await getParkingSpacesId();
   return {
     props: {
       data,
-      parkingSpaceId,
     },
   };
 }

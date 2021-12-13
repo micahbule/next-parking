@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import {
   VStack,
@@ -13,10 +13,7 @@ import {
 } from "@chakra-ui/react";
 
 export default function ParkingSpacesList(props) {
-  console.log(props);
-
   const [list, setList] = useState(props.dataObject);
-  console.log(list);
 
   // handlers
   const onEditHandler = (id) => {
@@ -31,11 +28,18 @@ export default function ParkingSpacesList(props) {
       <VStack spacing={3} alignItems="flex-start">
         <Heading size="2xl">List of Existing Parking Spaces</Heading>
       </VStack>
-
+      <Heading as="h3">Click a parking space to check availability</Heading>
       <UnorderedList>
         {list.map((item, index) => (
           <ListItem key={index} id={item.id}>
-            {item.attributes.name} - {item.attributes.slots} slots
+            <Link
+              color="teal.500"
+              textDecoration="underline"
+              href={`/parking-spaces/${item.id}`}
+            >
+              {item.attributes.name} - {item.attributes.slots} slots
+            </Link>
+
             <Button width="60px" ml={10} onClick={() => onEditHandler(item.id)}>
               Edit
             </Button>
@@ -49,21 +53,6 @@ export default function ParkingSpacesList(props) {
           </ListItem>
         ))}
       </UnorderedList>
-      <Text>
-        Or did you want to create new parking spaces? If so, click{" "}
-        <Link href="/create-parking-space">here</Link>.
-      </Text>
     </VStack>
   );
-}
-
-{
-  /* <table>
-        <thead>
-          <tr className="table-heading">
-            <th className="hospital-name">NAME</th>
-          </tr>
-        </thead>
-        <tbody className="table-body"></tbody>
-      </table> */
 }
