@@ -12,10 +12,17 @@ import {
   useBreakpointValue,
   ModalHeader,
   useDisclosure,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalBody,
+  ModalCloseButton,
 } from "@chakra-ui/react";
 
 import { useState, useEffect } from "react";
 import axios from "axios";
+
+import CreatePaymentRecord from "../create-payment-record/index";
 
 const CreateParkingRecord = (props) => {
   const colSpan = useBreakpointValue({ base: 2, md: 1 });
@@ -31,18 +38,13 @@ const CreateParkingRecord = (props) => {
   const [updatedBy, setUpdatedBy] = useState("admin - edit");
 
   useEffect(() => {
-    // console.log(props);
     setParkingSlot(props.tagName);
   }, []);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const checkInCreateNewRecord = () => {
-    if (
-      plateNumber !== ""
-      //  && if name exists// add if duplicate name
-      // and if record of parkingslot exists don't proceed
-    ) {
+    if (plateNumber !== "") {
       let data = {
         data: {
           attributes: {
@@ -57,12 +59,14 @@ const CreateParkingRecord = (props) => {
           },
         },
       };
-
-      console.log("new record created: ", data);
+      let stringified = JSON.stringify(data);
       axios
-        .post(`https://entity-sandbox.meeco.dev/api/parking-records`, data)
+        .post(
+          `https://entity-sandbox.meeco.dev/api/parking-records`,
+          stringified
+        )
         .then((res) => {
-          console.log(res.data, "new record created");
+          console.log(res.data, "new parking record created");
         });
       clearFields();
     } else {
@@ -71,8 +75,34 @@ const CreateParkingRecord = (props) => {
     props.onClose();
   };
 
+  //   const checkWhichSlotsTaken = () => {
+  //  axios
+  //         .post("https://beam-notes-db.herokuapp.com/users/email-exists", {
+  //           emailToCheck: email,
+  //         })
+  //         .then((res) => {
+  //           console.log(res.data);
+  //           if (res.data === true) {
+  //             alert("Oops. That account exists. Login or check your email.");
+  //           } else {
+  //             axios
+  //               .post("https://beam-notes-db.herokuapp.com/users/register", {
+
+  //   }
+
   const checkOutEditRecord = () => {
-    console.log("record edited");
+    //   //check parking record id
+    //   axios
+    //     .post(`https://entity-sandbox.meeco.dev/api/parking-records/${id}`, {
+    //       idToCheck: id,
+    //     })
+    //     .then((res) => {
+    //       console.log(res.data);
+    //     });
+    // };
+    //proceed only if parking slot record exists, otherwise there was no check in that happened
+    // so first find the id number in the database
+    // console.log("record edited");
     // let data = {
     //   time_vacated: timeVacated,
     //   plate_number: plateNumber,
@@ -86,6 +116,10 @@ const CreateParkingRecord = (props) => {
     //   .then((res) => {
     //     console.log(res.data, "new record created");
     //   });
+  };
+
+  const checkOutHandler = () => {
+    onOpen();
   };
 
   const clearFields = () => {
@@ -133,14 +167,25 @@ const CreateParkingRecord = (props) => {
               Park Here
             </Button>
             <Button
+              href="/create-payment-record"
               colorScheme="red"
               mr={3}
               onClick={() => {
-                checkOutEditRecord();
+                onClose();
+                checkOutHandler();
               }}
             >
               Check Out
             </Button>
+            <Modal isOpen={isOpen} onClose={onClose}>
+              <ModalOverlay />
+              <ModalContent>
+                <ModalCloseButton />
+                <ModalBody>
+                  <CreatePaymentRecord onClose={onClose} />
+                </ModalBody>
+              </ModalContent>
+            </Modal>
           </GridItem>
         </SimpleGrid>
       </VStack>

@@ -15,8 +15,6 @@ import {
   Heading,
 } from "@chakra-ui/react";
 
-import axios from "axios";
-
 import CreateParkingRecord from "../create-parking-record/index";
 
 const ParkingSpace = () => {
@@ -26,49 +24,31 @@ const ParkingSpace = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const [parkingSpaceData, setParkingSpaceData] = useState("");
-  // const [spaceId, setSpaceId] = useState("");
-
+  const [parkingSpaceId, setParkingSpaceId] = useState("");
+  const [parkingName, setParkingName] = useState("");
   const [parkingSlots, setParkingSlots] = useState(50);
   const [selectedSlot, setSelectedSlot] = useState("");
-  const [parkingName, setParkingName] = useState("");
 
-  // console.log(parkingSpaceData);
-  // console.log(parkingSlots);
-
-  // const fetchSpaceData = () => {
-  //   axios.get(`https://entity-sandbox.meeco.dev/api/parking-spaces/${id}`).then(
-  //     (response) => {
-  //       // console.log(response.data.data);
-  //       setParkingSpaceData(response.data.data);
-  //       setParkingSlots(response.data.data.attributes.slots);
-  //     },
-  //     (error) => {
-  //       console.log(error);
-  //     }
-  //   );
-  // };
+  useEffect(() => {
+    const getParkingSpaceData = async () => {
+      const res = await fetch(
+        `https://entity-sandbox.meeco.dev/api/parking-spaces/${id}`
+      );
+      const responseJson = await res.json();
+      let data = responseJson.data;
+      console.log(data);
+      setParkingSpaceData(data.attributes);
+      setParkingSpaceId(data.id);
+    };
+    getParkingSpaceData();
+    // setParkingSlots(parkingSpaceData.attributes.slots);
+    // setParkingName(parkingSpaceData.attributes.name);
+  }, []);
 
   const selectedSlotHandler = (slotTagName) => {
     onOpen();
     setSelectedSlot(slotTagName);
   };
-
-  useEffect(() => {
-    axios.get(`https://entity-sandbox.meeco.dev/api/parking-spaces/${id}`).then(
-      (response) => {
-        setParkingSpaceData(response.data.data);
-        setParkingSlots(response.data.data.attributes.slots);
-        setParkingName(response.data.data.attributes.name);
-      },
-      (error) => {
-        console.log(error);
-      }
-    );
-  }, []);
-
-  useEffect(() => {
-    console.log(parkingName);
-  }, []);
 
   // create an array of slots according to number of slots per parking space
   const slotTagsArray = [];
@@ -104,7 +84,8 @@ const ParkingSpace = () => {
                   <ModalBody>
                     <CreateParkingRecord
                       tagName={selectedSlot}
-                      // parkingSpaceData={parkingSpaceData}
+                      parkingSpaceId={parkingSpaceId}
+                      parkingSpaceData={parkingSpaceData}
                       onClose={onClose}
                     />
                   </ModalBody>
