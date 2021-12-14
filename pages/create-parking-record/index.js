@@ -18,6 +18,7 @@ import {
   ModalBody,
   ModalCloseButton,
   useToast,
+  Box,
 } from "@chakra-ui/react";
 
 import { useState, useEffect } from "react";
@@ -38,17 +39,20 @@ const CreateParkingRecord = (props) => {
   const [createdBy, setCreatedBy] = useState("admin");
   const [updatedBy, setUpdatedBy] = useState("admin - edit");
 
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const toast = useToast();
+
   useEffect(() => {
     setParkingSlot(props.tagName);
+    // console.log(props);
   }, []);
-
-  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const openToast = () => {
     toast({
       position: "top",
       status: "success",
-      duration: 3500,
+      duration: 9000,
       render: () => (
         <Box color="white" p={3} bg="green.500">
           <Text textAlign="center">Parking Successful</Text>
@@ -57,7 +61,8 @@ const CreateParkingRecord = (props) => {
     });
   };
 
-  const checkInCreateNewRecord = () => {
+  const checkInCreateNewRecord = (e) => {
+    e.preventDefault();
     if (plateNumber !== "") {
       let data = {
         data: {
@@ -73,37 +78,19 @@ const CreateParkingRecord = (props) => {
           },
         },
       };
-      let stringified = JSON.stringify(data);
       axios
-        .post(
-          `https://entity-sandbox.meeco.dev/api/parking-records`,
-          stringified
-        )
+        .post(`https://entity-sandbox.meeco.dev/api/parking-records`, data)
         .then((res) => {
           console.log(res.data, "new parking record created");
           openToast();
         });
       clearFields();
+      props.onClose();
+      onClose();
     } else {
-      console.log("cannot be blank");
+      alert("Plate number cannot be blank");
     }
-    props.onClose();
   };
-
-  //   const checkWhichSlotsTaken = () => {
-  //  axios
-  //         .post("https://beam-notes-db.herokuapp.com/users/email-exists", {
-  //           emailToCheck: email,
-  //         })
-  //         .then((res) => {
-  //           console.log(res.data);
-  //           if (res.data === true) {
-  //             alert("Oops. That account exists. Login or check your email.");
-  //           } else {
-  //             axios
-  //               .post("https://beam-notes-db.herokuapp.com/users/register", {
-
-  //   }
 
   // const checkOutEditRecord = () => {
   //     //check parking record id
@@ -136,7 +123,6 @@ const CreateParkingRecord = (props) => {
   const checkOutHandler = () => {
     onOpen();
     // checkOutEditRecord();
-    console.log();
   };
 
   const clearFields = () => {
@@ -157,6 +143,7 @@ const CreateParkingRecord = (props) => {
         <VStack spacing={3} alignItems="flex-start">
           <ModalHeader>
             <Text size="xl">Create New Parking Record</Text>
+            <Text>in {props.parkingSpaceData.name}</Text>
             <Heading size="3xl"> Parking Slot {parkingSlot} </Heading>
           </ModalHeader>
         </VStack>
@@ -177,8 +164,8 @@ const CreateParkingRecord = (props) => {
             <Button
               colorScheme="blue"
               mr={3}
-              onClick={() => {
-                checkInCreateNewRecord();
+              onClick={(e) => {
+                checkInCreateNewRecord(e);
               }}
             >
               Park Here

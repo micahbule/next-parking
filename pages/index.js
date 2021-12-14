@@ -15,14 +15,14 @@ import {
 import React, { useState, useEffect } from "react";
 
 import CreateParkingSpace from "./parking-spaces/create-parking-space";
-
-// import { getParkingSpaces } from "../lib/api";
+import Header from "../src/components/header";
+import Footer from "../src/components/footer";
 import axios from "axios";
 
-export default function Home({ data }) {
+export default function Home() {
   const { toggleColorMode } = useColorMode();
 
-  const [parkingList, setParkingList] = useState(data);
+  const [parkingList, setParkingList] = useState("");
 
   const bgColor = useColorModeValue("gray.50", "whiteAlpha.50");
   const secondaryTextColor = useColorModeValue("gray.600", "gray.400");
@@ -41,31 +41,13 @@ export default function Home({ data }) {
     getParkingSpacesList();
   }, []);
 
-  // // edit details in list
-  // const editItem = (id) => {
-  //   console.log(id, "edited");
-  //   // axios
-  //   //   .put(`https://entity-sandbox.meeco.dev/api/parking-spaces/${id}`, {
-  //   //     data,
-  //   //   })
-  //   //   .then((res) => {
-  //   //     console.log(res.data);
-  //   //   });
-  // };
-
-  // // delete from list FOREVERR
-  // const deleteItem = (id) => {
-  //   console.log(id, "deleted forever");
-  //   axios
-  //     .delete(`https://entity-sandbox.meeco.dev/api/parking-spaces/${id}`)
-  //     .then((res) => {
-  //       console.log(res.data);
-  //     });
-  // };
+  console.log(parkingList);
 
   return (
     <Container maxW="container.xl" p={0}>
-      <Button onClick={toggleColorMode}>Change Color Theme</Button>
+      <Header>
+        {/* <Button onClick={toggleColorMode}>Change Color Theme</Button> */}
+      </Header>
       <Flex
         h={{ base: "auto", md: "100vh" }}
         py={[0, 10, 20]}
@@ -82,32 +64,23 @@ export default function Home({ data }) {
           </VStack>
           <Heading as="h3">Choose a parking space.</Heading>
           <UnorderedList>
-            {parkingList.map((item, index) => (
-              <ListItem key={index} id={item.id}>
-                <Link
-                  color="teal.500"
-                  textDecoration="underline"
-                  href={`/parking-spaces/${item.id}`}
-                >
-                  {item.attributes.name} - {item.attributes.slots} slots
-                </Link>
-
-                {/* <Button
-                  width="60px"
-                  ml={10}
-                  onClick={() => onEditHandler(item.id)}
-                >
-                  Edit
-                </Button>
-                <Button
-                  width="60px"
-                  ml={10}
-                  onClick={() => onDeleteHandler(item.id)}
-                >
-                  Delete
-                </Button> */}
-              </ListItem>
-            ))}
+            {parkingList === "" ? (
+              <VStack spacing={3} alignItems="flex-start">
+                <Heading size="2xl">Data Loading...</Heading>
+              </VStack>
+            ) : (
+              parkingList.map((item, index) => (
+                <ListItem key={index} id={item.id}>
+                  <Link
+                    color="teal.500"
+                    textDecoration="underline"
+                    href={`/parking-spaces/${item.id}`}
+                  >
+                    {item.attributes.name} - {item.attributes.slots} slots
+                  </Link>
+                </ListItem>
+              ))
+            )}
           </UnorderedList>
         </VStack>
       </Flex>

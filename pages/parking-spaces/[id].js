@@ -13,10 +13,12 @@ import {
   useDisclosure,
   Text,
   Heading,
-  useToast,
+  Link,
 } from "@chakra-ui/react";
 
 import CreateParkingRecord from "../create-parking-record/index";
+import axios from "axios";
+import { responseSymbol } from "next/dist/server/web/spec-compliant/fetch-event";
 
 const ParkingSpace = () => {
   const router = useRouter();
@@ -24,18 +26,18 @@ const ParkingSpace = () => {
   const { id } = router.query;
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  const [parkingSpaceData, setParkingSpaceData] = useState("");
+  const [parkingSpaceData, setParkingSpaceData] = useState([]);
   const [parkingSpaceId, setParkingSpaceId] = useState("");
-  const [parkingName, setParkingName] = useState("");
-  const [parkingSlots, setParkingSlots] = useState(50);
+  // const [parkingSlots, setParkingSlots] = useState(0);
   const [selectedSlot, setSelectedSlot] = useState("");
 
+  // fetch - would it be better to use axios?
   useEffect(() => {
     const getParkingSpaceData = async () => {
       const res = await fetch(
         `https://entity-sandbox.meeco.dev/api/parking-spaces/${id}`
       );
-      const responseJson = await res.json();
+      let responseJson = await res.json();
       let data = responseJson.data;
       console.log(data);
       setParkingSpaceData(data.attributes);
@@ -49,22 +51,9 @@ const ParkingSpace = () => {
     setSelectedSlot(slotTagName);
   };
 
-  const openToast = () => {
-    toast({
-      position: "top",
-      status: "success",
-      duration: 3500,
-      render: () => (
-        <Box color="white" p={3} bg="green.500">
-          <Text textAlign="center">Parking Successful</Text>
-        </Box>
-      ),
-    });
-  };
-
   // create an array of slots according to number of slots per parking space
   const slotTagsArray = [];
-  for (let i = 1; i <= parkingSlots; i++) {
+  for (let i = 1; i <= parkingSpaceData.slots; i++) {
     slotTagsArray.push(i);
   }
 
@@ -72,39 +61,49 @@ const ParkingSpace = () => {
 
   return (
     <VStack w="full" h="full" p={10} spacing={10} alignItems="flex-start">
+      <Link textDecoration="underline" href="/">
+        Go back to Home
+      </Link>
       <VStack spacing={3} alignItems="flex-start">
         <Text> Parking Space ID {id}</Text>
         <Heading fontWeight="800" as="h1">
-          {parkingName}
+          {parkingSpaceData.name} - {parkingSpaceData.slots} slots
         </Heading>
         <Text fontSize="2xl" fontWeight="400">
-          Available slots: {parkingSlots}
+          Available slots:
+          {parkingSpaceData.slots === 0 ? "Loading" : parkingSpaceData.slots}
         </Text>
         <Box>
-          {slotTagsArray.map((slotTagName, index) => (
-            <Button
-              key={index}
-              onClick={() => {
-                selectedSlotHandler(slotTagName);
-              }}
-            >
-              {slotTagName}
-              <Modal isOpen={isOpen} onClose={onClose}>
-                <ModalOverlay />
-                <ModalContent>
-                  <ModalCloseButton />
-                  <ModalBody>
-                    <CreateParkingRecord
-                      tagName={selectedSlot}
-                      parkingSpaceId={parkingSpaceId}
-                      parkingSpaceData={parkingSpaceData}
-                      onClose={onClose}
-                    />
-                  </ModalBody>
-                </ModalContent>
-              </Modal>
-            </Button>
-          ))}
+          {parkingSpaceData === [] ? (
+            <VStack spacing={3} alignItems="flex-start">
+              <Heading size="2xl">Data Loading...</Heading>
+            </VStack>
+          ) : (
+            slotTagsArray.map((slotTagName, index) => (
+              <Button
+                key={index}
+                onClick={() => {
+                  selectedSlotHandler(slotTagName);
+                }}
+              >
+                {slotTagName}
+                <Modal isOpen={isOpen} onClose={onClose}>
+                  <ModalOverlay />
+                  <ModalContent>
+                    <ModalCloseButton />
+                    <ModalBody>
+                      <CreateParkingRecord
+                        tagName={selectedSlot}
+                        parkingSpaceId={parkingSpaceId}
+                        parkingSpaceData={parkingSpaceData}
+                        onClose={onClose}
+                      />
+                    </ModalBody>
+                  </ModalContent>
+                </Modal>
+              </Button>
+            ))
+          )}
         </Box>
       </VStack>
     </VStack>

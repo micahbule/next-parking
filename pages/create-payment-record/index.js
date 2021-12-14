@@ -15,7 +15,7 @@ import {
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-const CreatePaymentRecord = () => {
+const CreatePaymentRecord = (props) => {
   const colSpan = useBreakpointValue({ base: 2, md: 1 });
   const bgColor = useColorModeValue("gray.50", "whiteAlpha.50");
   const secondaryTextColor = useColorModeValue("gray.600", "gray.400");
@@ -80,16 +80,19 @@ const CreatePaymentRecord = () => {
           <Heading size="2xl">Payment Record</Heading>
         </VStack>
         <SimpleGrid columns={2} columnGap={3} rowGap={6} w="full">
-          <GridItem colSpan={colSpan}>Time </GridItem>
-          <GridItem colSpan={1}>lalala</GridItem>
-
-          <GridItem colSpan={2}>Time In- </GridItem>
-          <GridItem colSpan={2}>Time Out - </GridItem>
-          <GridItem colSpan={1}>Duration - </GridItem>
-          <GridItem colSpan={1}>
+          <GridItem colSpan={colSpan}>Data </GridItem>
+          <GridItem colSpan={1}>Time In </GridItem>
+          <GridItem colSpan={1}>Time Out </GridItem>
+          <GridItem colSpan={1}>Duration of Stay </GridItem>
+          <GridItem colSpan={1}>Amount Due </GridItem>
+          <GridItem colSpan={colSpan}>
             <Button
+              size="md"
+              variant="outline"
+              colorScheme="green"
               onClick={() => {
                 onSubmitPayHandler();
+                props.onClose();
               }}
             >
               Pay Amount
