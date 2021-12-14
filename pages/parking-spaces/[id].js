@@ -13,6 +13,7 @@ import {
   useDisclosure,
   Text,
   Heading,
+  useToast,
 } from "@chakra-ui/react";
 
 import CreateParkingRecord from "../create-parking-record/index";
@@ -41,13 +42,24 @@ const ParkingSpace = () => {
       setParkingSpaceId(data.id);
     };
     getParkingSpaceData();
-    // setParkingSlots(parkingSpaceData.attributes.slots);
-    // setParkingName(parkingSpaceData.attributes.name);
   }, []);
 
   const selectedSlotHandler = (slotTagName) => {
     onOpen();
     setSelectedSlot(slotTagName);
+  };
+
+  const openToast = () => {
+    toast({
+      position: "top",
+      status: "success",
+      duration: 3500,
+      render: () => (
+        <Box color="white" p={3} bg="green.500">
+          <Text textAlign="center">Parking Successful</Text>
+        </Box>
+      ),
+    });
   };
 
   // create an array of slots according to number of slots per parking space

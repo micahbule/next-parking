@@ -17,6 +17,7 @@ import {
   ModalContent,
   ModalBody,
   ModalCloseButton,
+  useToast,
 } from "@chakra-ui/react";
 
 import { useState, useEffect } from "react";
@@ -43,6 +44,19 @@ const CreateParkingRecord = (props) => {
 
   const { isOpen, onOpen, onClose } = useDisclosure();
 
+  const openToast = () => {
+    toast({
+      position: "top",
+      status: "success",
+      duration: 3500,
+      render: () => (
+        <Box color="white" p={3} bg="green.500">
+          <Text textAlign="center">Parking Successful</Text>
+        </Box>
+      ),
+    });
+  };
+
   const checkInCreateNewRecord = () => {
     if (plateNumber !== "") {
       let data = {
@@ -67,6 +81,7 @@ const CreateParkingRecord = (props) => {
         )
         .then((res) => {
           console.log(res.data, "new parking record created");
+          openToast();
         });
       clearFields();
     } else {
@@ -90,36 +105,38 @@ const CreateParkingRecord = (props) => {
 
   //   }
 
-  const checkOutEditRecord = () => {
-    //   //check parking record id
-    //   axios
-    //     .post(`https://entity-sandbox.meeco.dev/api/parking-records/${id}`, {
-    //       idToCheck: id,
-    //     })
-    //     .then((res) => {
-    //       console.log(res.data);
-    //     });
-    // };
-    //proceed only if parking slot record exists, otherwise there was no check in that happened
-    // so first find the id number in the database
-    // console.log("record edited");
-    // let data = {
-    //   time_vacated: timeVacated,
-    //   plate_number: plateNumber,
-    //   parking_payment: parkingPayment,
-    //   updatedAt: updatedAt,
-    //   updatedBy: updatedBy,
-    // };
-    // console.log(data);
-    // axios
-    //   .put(`https://entity-sandbox.meeco.dev/api/parking-records/${id}`, { data })
-    //   .then((res) => {
-    //     console.log(res.data, "new record created");
-    //   });
-  };
+  // const checkOutEditRecord = () => {
+  //     //check parking record id
+  //     axios
+  //       .post(`https://entity-sandbox.meeco.dev/api/parking-records/${id}`, {
+  //         idToCheck: id,
+  //       })
+  //       .then((res) => {
+  //         console.log(res.data);
+  //       });
+  //   };
+  //   // proceed only if parking slot record exists, otherwise there was no check in that happened
+  //   // so first find the id number in the database
+  //   // console.log("record edited");
+  //   let data = {
+  //     time_vacated: timeVacated,
+  //     plate_number: plateNumber,
+  //     parking_payment: parkingPayment,
+  //     updatedAt: updatedAt,
+  //     updatedBy: updatedBy,
+  //   };
+  //   console.log(data);
+  //   axios
+  //     .put(`https://entity-sandbox.meeco.dev/api/parking-records/${id}`, { data })
+  //     .then((res) => {
+  //       console.log(res.data, "new record created");
+  //     });
+  // };
 
   const checkOutHandler = () => {
     onOpen();
+    // checkOutEditRecord();
+    console.log();
   };
 
   const clearFields = () => {
@@ -171,7 +188,6 @@ const CreateParkingRecord = (props) => {
               colorScheme="red"
               mr={3}
               onClick={() => {
-                onClose();
                 checkOutHandler();
               }}
             >

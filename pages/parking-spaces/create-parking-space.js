@@ -1,7 +1,5 @@
 import {
   VStack,
-  Link,
-  Text,
   Heading,
   SimpleGrid,
   GridItem,
@@ -13,8 +11,6 @@ import {
   NumberInputStepper,
   NumberIncrementStepper,
   NumberDecrementStepper,
-  Select,
-  Checkbox,
   Button,
   useBreakpointValue,
 } from "@chakra-ui/react";
@@ -48,7 +44,7 @@ const CreateParkingSpace = ({ bgColor, secondaryTextColor }) => {
       axios
         .post(`https://entity-sandbox.meeco.dev/api/parking-spaces`, { data })
         .then((res) => {
-          console.log(res.data);
+          console.log(res.data, "NEW SPACE ADDED");
         });
 
       clearFields();
