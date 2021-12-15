@@ -24,12 +24,15 @@ import {
 
 import { useState, useEffect } from "react";
 import axios from "axios";
+import CreateParkingRecord from "../components/create-parking-record";
 
 const CreateSlotTags = (props) => {
   const [slots, setSlots] = useState([]);
   const [tagName, setTagName] = useState("");
   const [slotsToRender, setSlotsToRender] = useState([]);
   const [currentSlotsNum, setCurrentSlotsNum] = useState(0);
+
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   useEffect(() => {
     const getSlotsData = async () => {
@@ -43,18 +46,10 @@ const CreateSlotTags = (props) => {
           setCurrentSlotsNum(slotsData.length);
         });
     };
-    // getSlotsData();
-    // console.log(slots);
-    // if (slots === []) {
-    //   console.log("no data");
-    //   getSlotsData();
-    // }
     getSlotsData();
   }, []);
 
-  const capacityHandler = (params) => {
-    props.slotCapacityChecker();
-  };
+  const capacityHandler = (params) => {};
 
   const addSlot = () => {
     //TODO: if name exists, don't proceed. no duplicates
@@ -86,6 +81,11 @@ const CreateSlotTags = (props) => {
         });
       setTagName("");
     }
+  };
+
+  const selectedSlotHandler = (slotTagName) => {
+    onOpen();
+    //  setSelectedSlot(slotTagName);
   };
 
   return (
@@ -131,10 +131,27 @@ const CreateSlotTags = (props) => {
               ) : (
                 // TODO: conditional render, if available, green; else red
                 slotsToRender.map((slot, index) => (
-                  <Button key={index} id={slot.id}>
-                    {slot.attributes.slot_tag} -
-                    {slot.attributes.available.toString()}
-                  </Button>
+                  <>
+                    <Button
+                      key={index}
+                      id={slot.id}
+                      onClick={() => {
+                        selectedSlotHandler();
+                      }}
+                    >
+                      {slot.attributes.slot_tag} -
+                      {slot.attributes.available.toString()}
+                    </Button>
+                    <Modal isOpen={isOpen} onClose={onClose}>
+                      <ModalOverlay />
+                      <ModalContent>
+                        <ModalCloseButton />
+                        <ModalBody>
+                          <CreateParkingRecord />
+                        </ModalBody>
+                      </ModalContent>
+                    </Modal>
+                  </>
                 ))
               )}
             </GridItem>

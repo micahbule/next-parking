@@ -24,7 +24,7 @@ import {
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-// import CreatePaymentRecord from "../create-payment-record/index";
+import CreatePaymentRecord from "../components/create-payment-record";
 
 const CreateParkingRecord = (props) => {
   const colSpan = useBreakpointValue({ base: 2, md: 1 });
@@ -155,7 +155,7 @@ const CreateParkingRecord = (props) => {
         <VStack spacing={3} alignItems="flex-start">
           <ModalHeader>
             <Text size="xl">Create New Parking Record</Text>
-            <Text>in {props.parkingSpaceData.name}</Text>
+            {/* <Text>in {props.parkingSpaceData.name}</Text> */}
             <Heading size="3xl"> Parking Slot {parkingSlot} </Heading>
           </ModalHeader>
         </VStack>

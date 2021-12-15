@@ -16,7 +16,6 @@ import {
   Link,
 } from "@chakra-ui/react";
 
-import CreateParkingRecord from "../src/components/create-parking-record";
 import CreateSlotTags from "../src/components/create-slot-tags";
 
 const ParkingSpace = () => {
@@ -54,21 +53,10 @@ const ParkingSpace = () => {
     setSelectedSlot(slotTagName);
   };
 
-  // to check if at capacity
-  const slotCapacityChecker = (params) => {};
-
-  // create an array of slots according to number of slots per parking space
-  const slotTagsArray = [];
-  for (let i = 1; i <= parkingSpaceData.slots; i++) {
-    slotTagsArray.push(i);
-  }
-
-  //TODO: add letters to numbers, for slotTags
-
   return (
     <VStack w="full" h="full" p={10} spacing={10} alignItems="flex-start">
       <Link textDecoration="underline" href="/">
-        Go back to Home
+        Go back to Parking Spaces List
       </Link>
       <VStack spacing={3} alignItems="flex-start">
         <Text> Parking Space ID {id}</Text>
@@ -81,10 +69,7 @@ const ParkingSpace = () => {
           slots
         </Text>
 
-        <CreateSlotTags
-          spaceCapacity={spaceCapacity}
-          slotCapacityChecker={slotCapacityChecker}
-        />
+        <CreateSlotTags spaceCapacity={spaceCapacity} />
         {/* <Box>
           {parkingSpaceData === [] ? (
             <VStack spacing={3} alignItems="flex-start">
