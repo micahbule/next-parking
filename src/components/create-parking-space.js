@@ -18,7 +18,7 @@ import {
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-const CreateParkingSpace = ({ bgColor, secondaryTextColor }) => {
+const CreateParkingSpace = ({ prop, bgColor, secondaryTextColor }) => {
   const colSpan = useBreakpointValue({ base: 2, md: 1 });
 
   const [spaceName, setSpaceName] = useState("");

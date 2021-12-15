@@ -25,9 +25,8 @@ const ParkingSpace = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const [parkingSpaceData, setParkingSpaceData] = useState([]);
-  const [parkingSpaceId, setParkingSpaceId] = useState("");
+  const [parkingSpaceId, setParkingSpaceId] = useState(0);
   // const [parkingSlots, setParkingSlots] = useState(0);
-  const [selectedSlot, setSelectedSlot] = useState("");
 
   const [spaceCapacity, setSpaceCapacity] = useState();
 
@@ -38,20 +37,15 @@ const ParkingSpace = () => {
       );
       let responseJson = await res.json();
       let data = responseJson.data;
-      // console.log(data);
+      console.log(data);
       setParkingSpaceData(data.attributes);
       setParkingSpaceId(data.id);
       setSpaceCapacity(data.attributes.slots);
     };
-    if (id) {
+    if (parkingSpaceId) {
       getParkingSpaceData();
     }
   }, [id]);
-
-  const selectedSlotHandler = (slotTagName) => {
-    onOpen();
-    setSelectedSlot(slotTagName);
-  };
 
   return (
     <VStack w="full" h="full" p={10} spacing={10} alignItems="flex-start">
@@ -69,7 +63,11 @@ const ParkingSpace = () => {
           slots
         </Text>
 
-        <CreateSlotTags spaceCapacity={spaceCapacity} />
+        <CreateSlotTags
+          capacity={spaceCapacity}
+          data={parkingSpaceData}
+          id={parkingSpaceId}
+        />
         {/* <Box>
           {parkingSpaceData === [] ? (
             <VStack spacing={3} alignItems="flex-start">

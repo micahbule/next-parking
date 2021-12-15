@@ -29,7 +29,8 @@ import CreatePaymentRecord from "../components/create-payment-record";
 const CreateParkingRecord = (props) => {
   const colSpan = useBreakpointValue({ base: 2, md: 1 });
 
-  const [parkingSlot, setParkingSlot] = useState("");
+  const [parkingSpaceId, setParkingSpaceId] = useState("");
+  const [parkingTagName, setParkingTagName] = useState("");
   const [plateNumber, setPlateNumber] = useState("");
 
   const [parkingSlotRecordForCheckOut, setParkingSlotRecordForCheckOut] =
@@ -41,14 +42,11 @@ const CreateParkingRecord = (props) => {
 
   const toast = useToast();
 
-  // useEffect(() => {
-  //   const getParkingSlotRecordId = async () => {
-  //     if (parkingSlotRecordForCheckout) {
-  //       getParkingSlotRecordId();
-  //     }
-
-  //     if (recordId) { getParkingSlotRecordId() }
-  //   }, []
+  useEffect(() => {
+    // console.log(props);
+    setParkingSpaceId(props.spaceId);
+    setParkingTagName(props.tag);
+  }, []);
 
   const openToast = () => {
     toast({
@@ -64,31 +62,48 @@ const CreateParkingRecord = (props) => {
   };
 
   const checkInCreateNewRecord = (e) => {
+    console.log(parkingSpaceId, parkingTagName);
     e.preventDefault();
-    if (plateNumber !== "") {
-      let data = {
-        data: {
-          time_parked: new Date().toISOString(),
-          plate_number: plateNumber,
-        },
-      };
-      axios
-        .post(`https://entity-sandbox.meeco.dev/api/parking-records`, data)
-        .then((res) => {
-          console.log(
-            res.status,
-            "new parking record created",
-            res.data.data.id
-          );
-          setRecordId(res.data.data.id);
-          openToast();
-        });
-      clearFields();
-      props.onClose();
-      onClose();
-    } else {
-      alert("Plate number cannot be blank");
-    }
+    axios
+      .post(`https://entity-sandbox.meeco.dev/api/parking-records`, {
+        time_parked: new Date().toISOString(),
+        plate_number: plateNumber.toString(),
+        parking_slot: parkingTagName.toString(),
+      })
+      .then((res) => {
+        console.log(res.status, "new parking record created", res.data.data.id);
+        //upon getting back data, put to state
+        setRecordId(0);
+      });
+
+    // if (plateNumber !== "") {
+    //   let data = {
+    //     data: {
+    //       time_parked: new Date().toISOString(),
+    //       plate_number: plateNumber.toString(),
+    //       parking_slot: parkingTagName.toString(),
+    //     },
+    //   };
+    //   console.log(data);
+    //   axios
+    //     .post(`https://entity-sandbox.meeco.dev/api/parking-records`, {
+    //       time_parked: new Date().toISOString(),
+    //       plate_number: plateNumber.toString(),
+    //       parking_slot: parkingTagName.toString(),
+    //     })
+    //     .then((res) => {
+    //       console.log(
+    //         res.status,
+    //         "new parking record created",
+    //         res.data.data.id
+    //       );
+    //       // setRecordId(res.data.data.id);
+    //       openToast();
+    //     });
+    //   setPlateNumber("");
+    // } else {
+    //   alert("Plate number cannot be blank");
+    // }
   };
 
   // should be id of parking record, how do i find that? via plate number
@@ -111,42 +126,11 @@ const CreateParkingRecord = (props) => {
         });
     }
     console.log("id still undefined");
-
-    // const getParkingRecordId = async () => {
-    //   try {
-    //     let res = await axios.get(
-    //       `https://entity-sandbox.meeco.dev/api/parking-records?filters[plate_number]=${plateNumber}`
-    //     );
-    //     let parkingId = res.data.data.id;
-    //     console.log(parkingId);
-    //   } catch (error) {
-    //     console.log(error);
-    //   }
-
-    // getParkingRecordId();
-    // axios
-    //   ((res) => {
-    //     setParkingSlotRecordForCheckOut(res.data.data);
-    //   })
-    //   .then(
-    //     console.log(timeVacated, parkingSlotRecordForCheckOut.id)
-    //     // axios.put(
-    //     //   `https://entity-sandbox.meeco.dev/api/parking-records${parkingSlotRecordForCheckOut.id}`,
-    //     //   timeVacated
-    //     // )
-    //     // .then((res) => {
-    //     //   console.log(res.data);
-    //     // })
-    //   );
   };
 
   const checkOutHandler = () => {
     onOpen();
     checkOutEditRecord();
-  };
-
-  const clearFields = () => {
-    setPlateNumber("");
   };
 
   return (
@@ -156,7 +140,11 @@ const CreateParkingRecord = (props) => {
           <ModalHeader>
             <Text size="xl">Create New Parking Record</Text>
             {/* <Text>in {props.parkingSpaceData.name}</Text> */}
-            <Heading size="3xl"> Parking Slot {parkingSlot} </Heading>
+            <Heading size="3xl">
+              {" "}
+              Parking Slot {parkingTagName}
+              <Text fontSize="md">in Parking Space ID {parkingSpaceId}</Text>
+            </Heading>
           </ModalHeader>
         </VStack>
         <SimpleGrid columns={2} columnGap={3} rowGap={6} w="full">

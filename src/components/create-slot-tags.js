@@ -27,48 +27,58 @@ import axios from "axios";
 import CreateParkingRecord from "../components/create-parking-record";
 
 const CreateSlotTags = (props) => {
+  // console.log(props.id);
   const [slots, setSlots] = useState([]);
   const [tagName, setTagName] = useState("");
   const [slotsToRender, setSlotsToRender] = useState([]);
   const [currentSlotsNum, setCurrentSlotsNum] = useState(0);
+  const [spaceId, setSpaceId] = useState(0);
+
+  const [tagToPass, setTagToPass] = useState("");
 
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   useEffect(() => {
-    const getSlotsData = async () => {
+    setSpaceId(props.id);
+    const getThisSpaceData = async () => {
+      // GET /api/users?filters[firstName][$eq]=John
       const res = axios
         .get(`https://entity-sandbox.meeco.dev/api/parking-slots`)
         .then((res) => {
           // console.log(res.data.data);
           let slotsData = res.data.data;
+          console.log(slotsData);
           setSlots(slotsData);
           setSlotsToRender(slotsData);
           setCurrentSlotsNum(slotsData.length);
         });
     };
-    getSlotsData();
+    getThisSpaceData();
   }, []);
 
   const capacityHandler = (params) => {};
 
   const addSlot = () => {
     //TODO: if name exists, don't proceed. no duplicates
-    // TODO: if at capacity, disable input tag
-    // check if at capacity
+    // TODO: if at capacity, disable input tag /parking-slots?parking_space=<parking-space-id>
+
+    // get how many slots are in a specific parking space,
+    // this is also to check if space is at capacity
     axios
       .get(`https://entity-sandbox.meeco.dev/api/parking-slots`)
       .then((res) => {
         let result = res.data.data;
-        console.log(result.length);
+        // console.log(result.length);
         let num = result.length;
         setCurrentSlotsNum(num);
       });
-    if (currentSlotsNum >= props.spaceCapacity) {
+    if (currentSlotsNum >= props.capacity) {
       alert("Space at capacity. Unable to add slots.");
     } else {
       axios
         .post(`https://entity-sandbox.meeco.dev/api/parking-slots`, {
           data: {
+            parking_space: spaceId,
             slot_tag: tagName,
             available: true,
           },
@@ -84,8 +94,9 @@ const CreateSlotTags = (props) => {
   };
 
   const selectedSlotHandler = (slotTagName) => {
+    // console.log(slotTagName);
     onOpen();
-    //  setSelectedSlot(slotTagName);
+    setTagToPass(slotTagName);
   };
 
   return (
@@ -95,9 +106,10 @@ const CreateSlotTags = (props) => {
         <SimpleGrid columns={3} columnGap={3} rowGap={6} w="full">
           {/* TODO: update availability */}
           <GridItem colSpan={3}>
-            <Text>Occupied Slots: {currentSlotsNum}</Text>
+            <Text>Occupied Slots In This Parking Space: {currentSlotsNum}</Text>
             <Text>
-              Available Slots: {props.spaceCapacity - currentSlotsNum}
+              Available Slots in This Parking Space:{" "}
+              {props.capacity - currentSlotsNum}
             </Text>
           </GridItem>
 
@@ -131,12 +143,12 @@ const CreateSlotTags = (props) => {
               ) : (
                 // TODO: conditional render, if available, green; else red
                 slotsToRender.map((slot, index) => (
-                  <>
+                  <div key={index}>
                     <Button
                       key={index}
                       id={slot.id}
                       onClick={() => {
-                        selectedSlotHandler();
+                        selectedSlotHandler(slot.attributes.slot_tag);
                       }}
                     >
                       {slot.attributes.slot_tag} -
@@ -147,11 +159,14 @@ const CreateSlotTags = (props) => {
                       <ModalContent>
                         <ModalCloseButton />
                         <ModalBody>
-                          <CreateParkingRecord />
+                          <CreateParkingRecord
+                            spaceId={spaceId}
+                            tag={tagToPass}
+                          />
                         </ModalBody>
                       </ModalContent>
                     </Modal>
-                  </>
+                  </div>
                 ))
               )}
             </GridItem>
