@@ -13,23 +13,13 @@ import {
 } from "@chakra-ui/react";
 
 import React, { useState, useEffect } from "react";
-
+import { useQuery } from 'react-query'
 import CreateParkingSpace from "../src/components/create-parking-space";
 import Header from "../src/components/header";
 import { getParkingSpacesList } from "../services/api";
 
 export default function Home() {
-  const [parkingList, setParkingList] = useState("");
-  // const [new, setNew] = useState("")
-
-  // TODO: auto update. doesn't update automatically when a new parking space is addded welp // add new dependency
-  useEffect(() => {
-    getParkingSpacesList(setParkingList);
-  }, []);
-
-  // const newSpaceHandler = (params) => {
-  //   setNew()
-  // }
+  const { data, isLoading } = useQuery('getParkingSpaces', getParkingSpacesList)
 
   return (
     <Container maxW="container.xl" p={0}>
@@ -38,22 +28,19 @@ export default function Home() {
         py={[0, 10, 20]}
         direction={{ base: "column-reverse", md: "row" }}
       >
-        <CreateParkingSpace
-          setParkingList={setParkingList}
-        // new={newSpaceHandler}
-        />
+        <CreateParkingSpace />
 
         <VStack w="full" h="full" p={10} spacing={10} alignItems="flex-start">
           <VStack spacing={3} alignItems="flex-start">
             <Heading size="2xl">List of Existing Parking Spaces</Heading>
           </VStack>
           <UnorderedList>
-            {parkingList === "" ? (
+            {isLoading ? (
               <VStack spacing={3} alignItems="flex-start">
                 <Heading size="2xl">Data Loading...</Heading>
               </VStack>
             ) : (
-              parkingList.map((item, index) => (
+              data.data.map((item, index) => (
                 <ListItem key={index} id={item.id}>
                   <Link
                     color="teal.500"

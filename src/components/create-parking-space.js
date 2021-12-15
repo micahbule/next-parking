@@ -51,7 +51,7 @@ const CreateParkingSpace = ({ prop, bgColor, secondaryTextColor, setParkingList 
           setTimeout(() => {
             clearFields();
             setIsAdding(false)
-            getParkingSpacesList(setParkingList)
+            getParkingSpacesList()
           }, 3000)
           console.log(res.data, "NEW SPACE ADDED");
         });
