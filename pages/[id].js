@@ -16,9 +16,8 @@ import {
   Link,
 } from "@chakra-ui/react";
 
-import CreateParkingRecord from "../create-parking-record/index";
-import axios from "axios";
-import { responseSymbol } from "next/dist/server/web/spec-compliant/fetch-event";
+import CreateParkingRecord from "../src/components/create-parking-record";
+import CreateSlotTags from "../src/components/create-slot-tags";
 
 const ParkingSpace = () => {
   const router = useRouter();
@@ -31,7 +30,8 @@ const ParkingSpace = () => {
   // const [parkingSlots, setParkingSlots] = useState(0);
   const [selectedSlot, setSelectedSlot] = useState("");
 
-  // fetch - would it be better to use axios?
+  const [spaceCapacity, setSpaceCapacity] = useState();
+
   useEffect(() => {
     const getParkingSpaceData = async () => {
       const res = await fetch(
@@ -39,17 +39,23 @@ const ParkingSpace = () => {
       );
       let responseJson = await res.json();
       let data = responseJson.data;
-      console.log(data);
+      // console.log(data);
       setParkingSpaceData(data.attributes);
       setParkingSpaceId(data.id);
+      setSpaceCapacity(data.attributes.slots);
     };
-    getParkingSpaceData();
-  }, []);
+    if (id) {
+      getParkingSpaceData();
+    }
+  }, [id]);
 
   const selectedSlotHandler = (slotTagName) => {
     onOpen();
     setSelectedSlot(slotTagName);
   };
+
+  // to check if at capacity
+  const slotCapacityChecker = (params) => {};
 
   // create an array of slots according to number of slots per parking space
   const slotTagsArray = [];
@@ -67,13 +73,19 @@ const ParkingSpace = () => {
       <VStack spacing={3} alignItems="flex-start">
         <Text> Parking Space ID {id}</Text>
         <Heading fontWeight="800" as="h1">
-          {parkingSpaceData.name} - {parkingSpaceData.slots} slots
+          {parkingSpaceData.name}
         </Heading>
         <Text fontSize="2xl" fontWeight="400">
-          Available slots:
-          {parkingSpaceData.slots === 0 ? "Loading" : parkingSpaceData.slots}
+          Capacity:{" "}
+          {parkingSpaceData.slots === 0 ? "Loading" : parkingSpaceData.slots}{" "}
+          slots
         </Text>
-        <Box>
+
+        <CreateSlotTags
+          spaceCapacity={spaceCapacity}
+          slotCapacityChecker={slotCapacityChecker}
+        />
+        {/* <Box>
           {parkingSpaceData === [] ? (
             <VStack spacing={3} alignItems="flex-start">
               <Heading size="2xl">Data Loading...</Heading>
@@ -104,7 +116,7 @@ const ParkingSpace = () => {
               </Button>
             ))
           )}
-        </Box>
+        </Box> */}
       </VStack>
     </VStack>
   );
