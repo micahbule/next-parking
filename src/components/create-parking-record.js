@@ -27,15 +27,15 @@ import axios from "axios";
 import CreatePaymentRecord from "../components/create-payment-record";
 
 const CreateParkingRecord = (props) => {
+  //TODO: toggle availability of slots
   const colSpan = useBreakpointValue({ base: 2, md: 1 });
 
   const [parkingSpaceId, setParkingSpaceId] = useState("");
   const [parkingTagName, setParkingTagName] = useState("");
   const [plateNumber, setPlateNumber] = useState("");
+  const [slotId, setSlotId] = useState("");
 
-  const [parkingSlotRecordForCheckOut, setParkingSlotRecordForCheckOut] =
-    useState("");
-
+  // parking record created upon check in
   const [recordId, setRecordId] = useState("");
 
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -43,9 +43,10 @@ const CreateParkingRecord = (props) => {
   const toast = useToast();
 
   useEffect(() => {
-    // console.log(props);
+    console.log(props);
     setParkingSpaceId(props.spaceId);
     setParkingTagName(props.tag);
+    setSlotId(props.slotId);
   }, []);
 
   const openToast = () => {
@@ -61,71 +62,73 @@ const CreateParkingRecord = (props) => {
     });
   };
 
+  //TODO: toggle availability of slots
   const checkInCreateNewRecord = (e) => {
-    console.log(parkingSpaceId, parkingTagName);
+    console.log(parkingSpaceId.toString(), parkingTagName.toString());
     e.preventDefault();
-    axios
-      .post(`https://entity-sandbox.meeco.dev/api/parking-records`, {
-        time_parked: new Date().toISOString(),
-        plate_number: plateNumber.toString(),
-        parking_slot: parkingTagName.toString(),
-      })
-      .then((res) => {
-        console.log(res.status, "new parking record created", res.data.data.id);
-        //upon getting back data, put to state
-        setRecordId(0);
-      });
 
-    // if (plateNumber !== "") {
-    //   let data = {
-    //     data: {
-    //       time_parked: new Date().toISOString(),
-    //       plate_number: plateNumber.toString(),
-    //       parking_slot: parkingTagName.toString(),
-    //     },
-    //   };
-    //   console.log(data);
-    //   axios
-    //     .post(`https://entity-sandbox.meeco.dev/api/parking-records`, {
-    //       time_parked: new Date().toISOString(),
-    //       plate_number: plateNumber.toString(),
-    //       parking_slot: parkingTagName.toString(),
-    //     })
-    //     .then((res) => {
-    //       console.log(
-    //         res.status,
-    //         "new parking record created",
-    //         res.data.data.id
-    //       );
-    //       // setRecordId(res.data.data.id);
-    //       openToast();
-    //     });
-    //   setPlateNumber("");
-    // } else {
-    //   alert("Plate number cannot be blank");
-    // }
+    if (plateNumber !== "") {
+      let data = {
+        data: {
+          time_parked: new Date().toISOString(),
+          plate_number: plateNumber.toString(),
+          // parking_slot: parkingTagName.toString(), //parking slot not accepted!
+        },
+      };
+      axios
+        .post(`https://entity-sandbox.meeco.dev/api/parking-records`, data)
+        .then((res) => {
+          console.log(res.status, "new parking record created");
+          //upon getting back data, put parking record ID to state
+          setRecordId(res.data.data.id);
+        });
+      // // TODO: update availability in parking slots database using parking slot id
+
+      // i think this has to be put, then availability has to be changed
+      //  axios
+      //    .post(`https://entity-sandbox.meeco.dev/api/parking-slots/${slotId}`, )
+      //    .then((res) => {
+      //      console.log(res.status, "new parking record created", "AVAILABILITY OF SLOT CHANGED");
+      //    })
+    } else {
+      alert("Plate number cannot be blank");
+    }
   };
 
-  // should be id of parking record, how do i find that? via plate number
+  //TODO: update the correct parking record
+  //TODO: toggle availability of slots
+
+  // each parking tag has a unique corresponding record id
+  // each record id also has a unique plate number
+  // you can only edit using the record id
+
   const checkOutEditRecord = (recordId) => {
+    console.log(recordId);
     let timeVacated = new Date().toISOString();
     // console.log(timeVacated);
 
     let passTime = { data: { time_vacated: timeVacated } };
     console.log(passTime);
+    axios
+      .put(
+        `https://entity-sandbox.meeco.dev/api/parking-records/${recordId}`,
+        passTime
+      )
+      .then((res) => {
+        console.log(res.data, res.status);
+      });
 
-    console.log(recordId);
-    if (recordId !== undefined) {
-      axios
-        .put(
-          `https://entity-sandbox.meeco.dev/api/parking-records/${recordId}`,
-          passTime
-        )
-        .then((res) => {
-          console.log(res.data, res.status);
-        });
-    }
-    console.log("id still undefined");
+    // if (recordId !== undefined) {
+    //   axios
+    //     .put(
+    //       `https://entity-sandbox.meeco.dev/api/parking-records/${recordId}`,
+    //       passTime
+    //     )
+    //     .then((res) => {
+    //       console.log(res.data, res.status);
+    //     });
+    // }
+    // console.log("id still undefined");
   };
 
   const checkOutHandler = () => {

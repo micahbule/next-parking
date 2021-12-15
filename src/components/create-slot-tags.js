@@ -33,16 +33,16 @@ const CreateSlotTags = (props) => {
   const [slotsToRender, setSlotsToRender] = useState([]);
   const [currentSlotsNum, setCurrentSlotsNum] = useState(0);
   const [spaceId, setSpaceId] = useState(0);
+  const [slotId, setSlotId] = useState("");
 
-  const [tagToPass, setTagToPass] = useState("");
+  const [tagDataToPass, setTagDataToPass] = useState("");
 
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   useEffect(() => {
     setSpaceId(props.id);
     const getThisSpaceData = async () => {
-      // GET /api/users?filters[firstName][$eq]=John
-      const res = axios
+      const res = await axios
         .get(`https://entity-sandbox.meeco.dev/api/parking-slots`)
         .then((res) => {
           // console.log(res.data.data);
@@ -68,35 +68,48 @@ const CreateSlotTags = (props) => {
       .get(`https://entity-sandbox.meeco.dev/api/parking-slots`)
       .then((res) => {
         let result = res.data.data;
-        // console.log(result.length);
         let num = result.length;
         setCurrentSlotsNum(num);
       });
     if (currentSlotsNum >= props.capacity) {
       alert("Space at capacity. Unable to add slots.");
     } else {
-      axios
-        .post(`https://entity-sandbox.meeco.dev/api/parking-slots`, {
-          data: {
-            parking_space: spaceId,
-            slot_tag: tagName,
-            available: true,
-          },
-        })
-        .then((res) => {
-          console.log(res.status);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-      setTagName("");
+      if (tagName === "") {
+        alert("cannot be blank");
+      } else {
+        axios
+          .post(`https://entity-sandbox.meeco.dev/api/parking-slots`, {
+            data: {
+              parking_space: spaceId,
+              slot_tag: tagName,
+              available: true,
+            },
+          })
+          .then((res) => {
+            console.log(res.status, res.data);
+          });
+        setTagName("");
+      }
     }
   };
 
+  const getSlotId = (slotTagName) => {
+    axios
+      .get(
+        `https://entity-sandbox.meeco.dev/api/parking-slots?filters[slot_tag]=${slotTagName}`
+      )
+      .then((res) => {
+        console.log(res.data);
+        let slotId = res.data.id;
+        console.log(res.data.data.id); // why is this undefined??
+        // setSlotId(slotId);
+      });
+  };
+
   const selectedSlotHandler = (slotTagName) => {
-    // console.log(slotTagName);
     onOpen();
-    setTagToPass(slotTagName);
+    setTagDataToPass(slotTagName);
+    getSlotId(slotTagName);
   };
 
   return (
@@ -161,7 +174,9 @@ const CreateSlotTags = (props) => {
                         <ModalBody>
                           <CreateParkingRecord
                             spaceId={spaceId}
-                            tag={tagToPass}
+                            // TODO: change this probs
+                            tag={tagDataToPass}
+                            slotId={slotId}
                           />
                         </ModalBody>
                       </ModalContent>

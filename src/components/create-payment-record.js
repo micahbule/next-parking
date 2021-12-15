@@ -10,6 +10,7 @@ import {
   useToast,
   Box,
   Text,
+  Input,
 } from "@chakra-ui/react";
 
 import { useState, useEffect } from "react";
@@ -25,11 +26,11 @@ const CreatePaymentRecord = (props) => {
 
   const [parkingRecord, setParkingRecord] = useState("");
   const [amount, setAmount] = useState(0);
-  const [datePaid, setDatePaid] = useState(Date());
-  const [createdAt, setCreatedAt] = useState(Date());
-  const [updatedAt, setUpdatedAt] = useState(Date());
-  const [createdBy, setCreatedBy] = useState("admin");
-  const [updatedBy, setUpdatedBy] = useState("admin - edit");
+  // const [datePaid, setDatePaid] = useState(Date());
+  // const [createdAt, setCreatedAt] = useState(Date());
+  // const [updatedAt, setUpdatedAt] = useState(Date());
+  // const [createdBy, setCreatedBy] = useState("admin");
+  // const [updatedBy, setUpdatedBy] = useState("admin - edit");
 
   const openToast = () => {
     toast({
@@ -47,18 +48,15 @@ const CreatePaymentRecord = (props) => {
   };
 
   const onSubmitPayHandler = () => {
+    props.onClose();
     openToast();
-    onClose();
     let data = {
       data: {
-        attributes: {
-          amount: amount,
-          date_paid: datePaid,
-          createdAt: createdAt,
-          updatedAt: updatedAt,
-        },
+        amount: amount,
+        date_paid: new Date().toISOString(),
       },
     };
+    console.log(data);
     axios
       .post(`https://entity-sandbox.meeco.dev/api/parking-payments`, data)
       .then((res) => {
@@ -80,11 +78,21 @@ const CreatePaymentRecord = (props) => {
           <Heading size="2xl">Payment Record</Heading>
         </VStack>
         <SimpleGrid columns={2} columnGap={3} rowGap={6} w="full">
-          <GridItem colSpan={colSpan}>Data </GridItem>
+          <GridItem colSpan={colSpan}>Date: {new Date().toString()}</GridItem>
           <GridItem colSpan={1}>Time In </GridItem>
           <GridItem colSpan={1}>Time Out </GridItem>
           <GridItem colSpan={1}>Duration of Stay </GridItem>
-          <GridItem colSpan={1}>Amount Due </GridItem>
+          <GridItem colSpan={1}>
+            Amount Due
+            <Input
+              placeholder="Enter Price"
+              bg="white.100"
+              type="number"
+              onChange={(e) => {
+                setAmount(e.target.value);
+              }}
+            />
+          </GridItem>
           <GridItem colSpan={colSpan}>
             <Button
               size="md"
