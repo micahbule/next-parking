@@ -16,6 +16,7 @@ import React, { useState, useEffect } from "react";
 
 import CreateParkingSpace from "../src/components/create-parking-space";
 import Header from "../src/components/header";
+import { getParkingSpacesList } from "../services/api";
 
 export default function Home() {
   const [parkingList, setParkingList] = useState("");
@@ -23,16 +24,7 @@ export default function Home() {
 
   // TODO: auto update. doesn't update automatically when a new parking space is addded welp // add new dependency
   useEffect(() => {
-    const getParkingSpacesList = async () => {
-      const res = await fetch(
-        `https://entity-sandbox.meeco.dev/api/parking-spaces/`
-      );
-      const responseJson = await res.json();
-      let data = responseJson.data;
-      console.log(data);
-      setParkingList(data);
-    };
-    getParkingSpacesList();
+    getParkingSpacesList(setParkingList);
   }, []);
 
   // const newSpaceHandler = (params) => {
@@ -47,6 +39,7 @@ export default function Home() {
         direction={{ base: "column-reverse", md: "row" }}
       >
         <CreateParkingSpace
+          setParkingList={setParkingList}
         // new={newSpaceHandler}
         />
 

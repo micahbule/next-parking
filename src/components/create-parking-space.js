@@ -17,8 +17,9 @@ import {
 
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { getParkingSpacesList } from "../../services/api";
 
-const CreateParkingSpace = ({ prop, bgColor, secondaryTextColor }) => {
+const CreateParkingSpace = ({ prop, bgColor, secondaryTextColor, setParkingList }) => {
   const colSpan = useBreakpointValue({ base: 2, md: 1 });
 
   const [spaceName, setSpaceName] = useState("");
@@ -27,6 +28,7 @@ const CreateParkingSpace = ({ prop, bgColor, secondaryTextColor }) => {
   const [updatedAt, setUpdatedAt] = useState(Date());
   const [createdBy, setCreatedBy] = useState("admin for now");
   const [updatedBy, setUpdatedBy] = useState("admin for now - edit");
+  const [isAdding, setIsAdding] = useState(false);
 
   const submitHandler = () => {
     if (spaceName !== "") {
@@ -39,15 +41,21 @@ const CreateParkingSpace = ({ prop, bgColor, secondaryTextColor }) => {
         createdBy: createdBy,
         updatedBy: updatedBy,
       };
+      
+      setIsAdding(true)
 
       console.log({ data });
       axios
         .post(`https://entity-sandbox.meeco.dev/api/parking-spaces`, { data })
         .then((res) => {
+          setTimeout(() => {
+            clearFields();
+            setIsAdding(false)
+            getParkingSpacesList(setParkingList)
+          }, 3000)
           console.log(res.data, "NEW SPACE ADDED");
         });
 
-      clearFields();
     } else {
       console.log("cannot be blank");
     }
@@ -80,8 +88,9 @@ const CreateParkingSpace = ({ prop, bgColor, secondaryTextColor }) => {
             <FormControl>
               <FormLabel>Parking Space Name</FormLabel>
               <Input
+                disabled={isAdding}
                 placeholder="Name of Space"
-                // value={spaceName}
+                value={spaceName}
                 bg="white.100"
                 onChange={(e) => setSpaceName(e.target.value)}
               ></Input>
@@ -91,6 +100,7 @@ const CreateParkingSpace = ({ prop, bgColor, secondaryTextColor }) => {
             <FormControl>
               <FormLabel>Number of Slots Available</FormLabel>
               <NumberInput
+                disabled={isAdding}
                 bg="white.100"
                 value={slots}
                 defaultValue={slots}
@@ -110,6 +120,8 @@ const CreateParkingSpace = ({ prop, bgColor, secondaryTextColor }) => {
 
           <GridItem colSpan={2}>
             <Button
+              isLoading={isAdding}
+              disabled={isAdding}
               variant="outline"
               size="lg"
               w="full"
