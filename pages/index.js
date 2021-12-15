@@ -11,7 +11,7 @@ import {
   UnorderedList,
   ListItem,
 } from "@chakra-ui/react";
-
+import NextLink from "next/link";
 import React, { useState, useEffect } from "react";
 import { useQuery } from 'react-query'
 import CreateParkingSpace from "../src/components/create-parking-space";
@@ -34,6 +34,7 @@ export default function Home() {
           <VStack spacing={3} alignItems="flex-start">
             <Heading size="2xl">List of Existing Parking Spaces</Heading>
           </VStack>
+          <NextLink href="/parking-spaces"><a>Parking Spaces</a></NextLink>
           <UnorderedList>
             {isLoading ? (
               <VStack spacing={3} alignItems="flex-start">
